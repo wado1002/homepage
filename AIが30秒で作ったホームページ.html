@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>わたしの自己紹介</title>
+
+<!--
+  ===== 全項目入りサンプル =====
+  構成: トップ / わたしについて / 好きなもの / スキル / 作品 / 勉強中 / お知らせ / Q&A / つながる
+  「★書き換える」の場所を自分の内容に変えてください。
+  いらない項目は、<section> から </section> までと、目次(<nav>)の1行を消せばOKです。
+-->
+
+<style>
+/* ---------- 色(ライト/ダークで切り替わる) ---------- */
+:root {
+  --bg: #eaf4ff;
+  --card: #ffffff;
+  --text: #14213d;
+  --accent: #ff5d5d;
+  --sun: #ffd23f;
+}
+:root[data-theme="dark"] {
+  --bg: #14213d;
+  --card: #1f2f52;
+  --text: #eaf4ff;
+}
+
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; }               /* 目次ジャンプをなめらかに */
+body {
+  background: var(--bg); color: var(--text);
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  line-height: 1.8; overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
+}
+section { padding: 14vh 8vw 8vh; scroll-margin-top: 40px; position: relative; }
+p { max-width: 38em; }
+
+/* ---------- 目次(画面の上に固定) ---------- */
+nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 20;
+  display: flex; gap: 6px; align-items: center; padding: 10px 16px;
+  background: var(--bg); overflow-x: auto;      /* 項目が多い時は横にスクロール */
+  box-shadow: 0 2px 0 rgba(0,0,0,0.08);
+}
+nav a {
+  color: var(--text); text-decoration: none; white-space: nowrap;
+  padding: 6px 12px; border-radius: 999px; transition: transform 0.2s, background 0.2s;
+}
+nav a:hover { transform: translateY(-3px); }
+nav a.active { background: var(--sun); color: #14213d; }   /* 今見ている場所 */
+#theme-toggle {
+  margin-left: auto; cursor: pointer; border: 2px solid var(--text); background: var(--card);
+  color: var(--text); border-radius: 999px; padding: 4px 14px; font: inherit; white-space: nowrap;
+}
+
+/* ---------- 見出し ---------- */
+h2 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 1.5rem; display: inline-block;
+  background: linear-gradient(transparent 60%, var(--sun) 60%);
+}
+h2, .reveal { /* スクロールで現れる準備(最初は透明で少し下) */ }
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s, transform 0.8s; }
+.reveal.show { opacity: 1; transform: none; }
+
+/* ---------- トップ ---------- */
+#top { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+#top > * { position: relative; z-index: 1; }
+.avatar {                     /* ★画像にする時は、この div を <img src="images/me.jpg" alt=""> に変える */
+  width: 140px; height: 140px; border-radius: 50%; background: var(--sun);
+  display: grid; place-items: center; font-size: 4rem; margin-bottom: 1rem;
+  animation: bob 3s ease-in-out infinite alternate;
+}
+@keyframes bob { to { transform: translateY(-14px) rotate(6deg); } }
+h1 { font-size: clamp(2.8rem, 11vw, 7rem); line-height: 1.1; }
+@keyframes pop {
+  0% { transform: translateY(60px) scale(0.6); opacity: 0; }
+  70% { transform: translateY(-12px) scale(1.1); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+h1 .char { display: inline-block; opacity: 0; animation: pop 0.7s cubic-bezier(.3,1.4,.5,1) forwards; }
+.typing { font-size: clamp(1.1rem, 3vw, 1.6rem); margin-top: 1rem; min-height: 2.6em; }
+.cursor { display: inline-block; width: 2px; height: 1em; background: var(--text);
+          margin-left: 3px; vertical-align: -0.1em; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 背景の浮かぶ図形 */
+.shape { position: absolute; z-index: 0; animation: float 4s ease-in-out infinite alternate; }
+.circle { width: 110px; height: 110px; border-radius: 50%; background: var(--sun); top: 14%; right: 10%; }
+.square { width: 70px; height: 70px; background: var(--accent); bottom: 16%; right: 24%; animation-duration: 5.5s; }
+@keyframes float { to { transform: translateY(-40px) rotate(25deg); } }
+
+/* ---------- 好きなもの(タグ) ---------- */
+.tags { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+.tag { padding: 0.5rem 1.2rem; border: 2px solid var(--text); border-radius: 999px; background: var(--card);
+       transition: transform 0.25s, background 0.25s; }
+.tag:hover { transform: rotate(-6deg) scale(1.15); background: var(--sun); color: #14213d; }
+
+/* ---------- スキル(バーが伸びる) ---------- */
+.skill { max-width: 32em; margin-bottom: 1.2rem; }
+.bar { height: 14px; background: var(--card); border: 2px solid var(--text); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 1.2s ease-out; }
+.show .bar i { width: var(--lv); }               /* 現れたら --lv の長さまで伸びる */
+
+/* ---------- 作品(カード) ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
+.card { background: var(--card); border: 2px solid var(--text); border-radius: 16px; padding: 1.2rem;
+        transition: transform 0.25s, box-shadow 0.25s; }
+.card:hover { transform: translateY(-8px) rotate(-1deg); box-shadow: 0 10px 0 var(--accent); }
+.card .thumb { height: 110px; border-radius: 10px; background: var(--sun); margin-bottom: 0.8rem;
+               display: grid; place-items: center; font-size: 2.4rem; }
+
+/* ---------- 勉強中・お知らせ ---------- */
+.timeline { list-style: none; padding: 0; border-left: 4px solid var(--accent); }
+.timeline li { padding: 0 0 1.2rem 1.2rem; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -11px; top: 0.5em; width: 14px; height: 14px;
+                       border-radius: 50%; background: var(--sun); border: 2px solid var(--text); }
+.timeline time { font-weight: bold; margin-right: 0.8rem; }
+
+/* ---------- Q&A(クリックで開く) ---------- */
+details { max-width: 38em; background: var(--card); border: 2px solid var(--text); border-radius: 12px;
+          padding: 0.8rem 1.2rem; margin-bottom: 0.8rem; }
+summary { cursor: pointer; font-weight: bold; }
+details[open] p { animation: drop 0.4s ease-out; }
+@keyframes drop { from { opacity: 0; transform: translateY(-10px); } }
+
+/* ---------- リンクボタン ---------- */
+.links { display: flex; flex-wrap: wrap; gap: 1rem; }
+.links a { color: #14213d; text-decoration: none; padding: 0.8rem 1.6rem; background: var(--accent);
+           border-radius: 12px; font-weight: bold; box-shadow: 0 6px 0 var(--text);
+           transition: transform 0.15s, box-shadow 0.15s; }
+.links a:hover { transform: translateY(3px); box-shadow: 0 3px 0 var(--text); }
+.links a:active { transform: translateY(6px); box-shadow: 0 0 0 var(--text); }
+footer { text-align: center; padding: 2rem; opacity: 0.7; }
+
+/* 動きが苦手な人向けの設定 */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  h1 .char, .reveal { opacity: 1; transform: none; }
+  .bar i { width: var(--lv); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== 目次 ===== href="#名前" と、下の id="名前" が対応しています -->
+<nav>
+  <a href="#top">トップ</a>
+  <a href="#about">わたしについて</a>
+  <a href="#likes">好きなもの</a>
+  <a href="#skills">スキル</a>
+  <a href="#works">作品</a>
+  <a href="#learning">勉強中</a>
+  <a href="#news">お知らせ</a>
+  <a href="#qa">Q&amp;A</a>
+  <a href="#contact">つながる</a>
+  <a href="#???">???</a>
+  <button id="theme-toggle" aria-label="表示モードの切り替え">ダーク</button>
+</nav>
+
+<!-- ===== トップ ===== -->
+<section id="top">
+  <div class="shape circle"></div>
+  <div class="shape square"></div>
+  <img class="avatar" src="images/hikarin_mania.jpg" alt="ヒカリの写真">
+  <h1 id="name">はじめまして</h1>   <!-- ★名前(JSの NAME も同じに) -->
+  <p class="typing"><span id="typed"></span><span class="cursor"></span></p>
+</section>
+
+<!-- ===== わたしについて ===== -->
+<section id="about">
+  <h2 class="reveal">わたしについて</h2>
+  <!-- ★書き換える -->
+  <p class="reveal">現在はとある高校の工業科に所属しています。電気をメインに勉強していますが、リスクヘッジのために情報系の勉強もしとかないといけないと思ったのでこのサイトを作っている次第です。（中学の友人が自分でホームページを作って公開して自分も作りたいと思ったのは内緒）</p>
+</section>
+
+<!-- ===== 好きなもの ===== -->
+<section id="likes">
+  <h2 class="reveal">好きなもの</h2>
+  <div class="tags reveal">                       <!-- ★<span class="tag"> をコピーして増減 -->
+    <span class="tag">アニメ</span>
+    <span class="tag">中学の友人にダルがらみ(@Nautilus)</span>
+    <span class="tag">ゲーム(スマホゲームだとブルーアーカイブ、コンソールだとAPEX)</span>
+    <span class="tag">鉄道</span>
+  </div>
+</section>
+
+<!-- ===== スキル ===== -->
+<section id="skills">
+  <h2 class="reveal">スキル</h2>
+  <!-- ★ --lv の数字(%)でバーの長さが変わる -->
+  <div class="skill reveal" style="--lv: 5%"><p>文章を書く</p><div class="bar"><i></i></div></div>
+  <div class="skill reveal" style="--lv: 5%"><p>料理</p><div class="bar"><i></i></div></div>
+  <div class="skill reveal" style="--lv: 15%"><p>プログラミング</p><div class="bar"><i></i></div></div>
+  <div class="skill reveal" style="--lv: 15%"><p>ゲームの腕前</p><div class="bar"><i></i></div></div>
+  <div class="skill reveal" style="--lv: 205%"><p>nautilusとの友好度</p><div class="bar"><i></i></div></div>
+</section>
+
+<!-- ===== 作品 ===== -->
+<section id="works">
+  <h2 class="reveal">現在所有しているXアカウント</h2>
+  <div class="cards reveal">                      <!-- ★ .card をコピーして増減。絵文字は <img> に変えられる -->
+    <div class="thumb"><img src="images/hikarin_mania.jpg" alt="ヒカリマニア"></div>
+    <div class="thumb"><img src="images/wado.jpg" alt="wadooo"></div>
+    <div class="thumb"><img src="images/otogi.jpg" alt="天神山オトギ"></div>
+    <div class="thumb"><img src="images/no.jpg" alt="???"></div>
+    <div class="thumb"><img src="images/mao.jpg" alt="???"></div>
+  </div>
+</section>
+
+<!-- ===== 勉強中 ===== -->
+<section id="learning">
+  <h2 class="reveal">勉強中</h2>
+  <ul class="timeline reveal">                    <!-- ★ -->
+    <li><time>10月</time>HTMLで文字を表示できた</li>
+    <li><time>10月</time>CSSで色とアニメーションをつけた</li>
+    <li><time>これから</time>JavaScriptで動きを増やす</li>
+  </ul>
+</section>
+
+<!-- ===== お知らせ ===== -->
+<section id="news">
+  <h2 class="reveal">お知らせ</h2>
+  <ul class="timeline reveal">                    <!-- ★ -->
+    <li><time>10/27</time>ホームページを作り始めました</li>
+    <li><time>10/28</time>目次とダークモードを追加しました。プロフィールとXアカウントの追加をしました。</li>
+  </ul>
+</section>
+
+<!-- ===== Q&A ===== -->
+<section id="qa">
+  <h2 class="reveal">Q&amp;A</h2>
+  <div class="reveal">                            <!-- ★ <details> をコピーして増減 -->
+    <details><summary>休日は何をしていますか?</summary><p><s>散歩</s>やゲームをしています。</p></details>
+    <details><summary>好きな食べ物は?</summary><p>ネギトロ巻き！！それ以外も基本好き！！</p></details>
+    <details><summary>このサイトは何で作っていますか?</summary><p>HTML・CSS・JavaScriptで、自分で書いています。詳しくは後述します。</p></details>
+  </div>
+</section>
+
+<!-- ===== つながる ===== -->
+<section id="contact">
+  <h2 class="reveal">お問い合わせ</h2>
+  <div class="links reveal">                      <!-- ★ href にURLを入れる -->
+    <a href="mailto:example@example.com">メール</a>
+  </div>
+</section>
+
+<section id="???">
+  <h2 class="reveal">???</h2>
+  <div class="links reveal">                      <!-- ★ href にURLを入れる -->
+    <details><summary>このサイトの真実を開く</summary>実はこのサイトは97％ほどをclaudeAIが作成しており、ヒカリは自分の情報を入力しているだけです。
+    <a href="index.html">最初に自力で頑張ったサイトへ飛ぶ</a></p></details>
+  </div>
+</section>
+
+<footer>&copy; 2026 ヒカリさんのヒカリさんによる自己紹介</footer>
+
+<script>
+/* ---------- ★書き換える: 名前 と タイピングの言葉 ---------- */
+const NAME = "はじめまして";
+const PHRASES = ["ここは、わたしの自己紹介ページです。", "プログラミングを勉強中です。", "ゆっくり見ていってください。"];
+
+/* ---------- 名前を1文字ずつ弾ませる ---------- */
+const nameEl = document.getElementById("name");
+nameEl.textContent = "";
+[...NAME].forEach((ch, i) => {
+  const s = document.createElement("span");
+  s.className = "char"; s.textContent = ch; s.style.animationDelay = i * 0.1 + "s";
+  nameEl.appendChild(s);
+});
+
+/* ---------- タイピング風表示 ---------- */
+const typed = document.getElementById("typed");
+let p = 0, c = 0, del = false;
+function type() {
+  const t = PHRASES[p];
+  c += del ? -1 : 1;
+  typed.textContent = t.slice(0, c);
+  let wait = del ? 40 : 90;
+  if (!del && c === t.length) { del = true; wait = 1500; }
+  else if (del && c === 0) { del = false; p = (p + 1) % PHRASES.length; wait = 400; }
+  setTimeout(type, wait);
+}
+setTimeout(type, 1200);
+
+/* ---------- スクロールで現れる ---------- */
+const io = new IntersectionObserver((es) => {
+  es.forEach((e) => { if (e.isIntersecting) e.target.classList.add("show"); });
+}, { threshold: 0.2 });
+document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+/* ---------- 今見ている場所を目次で光らせる ---------- */
+const links = document.querySelectorAll("nav a");
+const spy = new IntersectionObserver((es) => {
+  es.forEach((e) => {
+    if (e.isIntersecting) {
+      links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id));
+    }
+  });
+}, { rootMargin: "-50% 0px -50% 0px" });   // 画面の真ん中に来たセクションを判定
+document.querySelectorAll("section").forEach((s) => spy.observe(s));
+
+/* ---------- ダーク/ライト切り替え(選んだ設定を覚える) ---------- */
+const root = document.documentElement;
+const btn = document.getElementById("theme-toggle");
+function setTheme(t) {
+  root.dataset.theme = t;
+  btn.textContent = t === "dark" ? "ライト" : "ダーク";
+  try { localStorage.setItem("theme", t); } catch (e) {}   // 保存できない環境でも動くように
+}
+let saved = null;
+try { saved = localStorage.getItem("theme"); } catch (e) {}
+setTheme(saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+btn.addEventListener("click", () => setTheme(root.dataset.theme === "dark" ? "light" : "dark"));
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;        /* 縦横比を保ったまま枠いっぱいに収める */
+  border-radius: 0%;       /* 丸く切り抜く */
+  transition: transform 0.3s;
+}
+img:hover {
+  transform: rotate(8deg) scale(1.1);
+}
+    /* 普通の状態(ライト)の色 */img {
+}
+img:hover {
+  transform: rotate(8deg) scale(1.1);
+}
+:root {
+  --bg: #eaf4ff;
+  --text: #14213d;
+}
+
+/* ダークの状態の色 */
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --text: #f3f3f3;
+}
+
+body {
+  background: var(--bg);   /* 変数を使う */
+  color: var(--text);
+  transition: background 0.4s, color 0.4s;   /* 切り替えをなめらかに */
+}
+    @keyframes float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-20px); }
+}
+
+p {
+  animation: float 2s ease-in-out infinite alternate;
+}
+  body {
+    color: #14213d;
+    font-family: sans-serif;
+    padding: 50px;
+  }
+  h1 {
+    font-size: 4rem;
+    color: #000000;
+    transition: transform 0.3s;   /* 変化を0.3秒かけてなめらかにする */
+  }
+  h1:hover {
+  transform: scale(1.2) rotate(-5deg);   /* 乗せたら1.2倍に拡大して少し傾ける */
+}
+  
+</style>
+<body>
+    <img src="images/驚き.jpg" alt="驚いた外人">
+    <button id="theme-toggle">ダークモードにする</button>
+    <h1>ヒカリ＿マニア</h1>
+<p>自己紹介</p>
+   <p>普段はブルーアーカイブというゲームをしています。あと、アニメや漫画も好きです。（ここはAI文）
+</p>
+ <p>ここで突然！！ヒカリさんのXアカウントはいくつあって、どれが本アカかわかりますでしょうか？？
+</p>
+<script>
+  const button = document.getElementById("theme-toggle");
+  const root = document.documentElement;   // <html> のこと
+
+  button.addEventListener("click", () => {
+    if (root.dataset.theme === "dark") {
+      root.dataset.theme = "light";
+      button.textContent = "ダークモードにする";
+    } else {
+      root.dataset.theme = "dark";
+      button.textContent = "ライトモードにする";
+    }
+  });
+</script>
+</body>
+</html>
